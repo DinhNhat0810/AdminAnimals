@@ -1,6 +1,3 @@
-// import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-// import { publicRoutes, privateRoutes } from '~/routes';
-// import { DefaultLayout } from '~/Layouts';
 import { Fragment } from 'react';
 import { BrowserRouter, Route, Switch, Redirect } from 'react-router-dom';
 import AuthLayout from 'layouts/auth';
