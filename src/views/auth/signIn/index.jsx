@@ -1,58 +1,78 @@
-/* eslint-disable */
-/*!
-  _   _  ___  ____  ___ ________  _   _   _   _ ___   
- | | | |/ _ \|  _ \|_ _|__  / _ \| \ | | | | | |_ _| 
- | |_| | | | | |_) || |  / / | | |  \| | | | | || | 
- |  _  | |_| |  _ < | | / /| |_| | |\  | | |_| || |
- |_| |_|\___/|_| \_\___/____\___/|_| \_|  \___/|___|
-                                                                                                                                                                                                                                                                                                                                       
-=========================================================
-* Horizon UI - v1.1.0
-=========================================================
-
-* Product Page: https://www.horizon-ui.com/
-* Copyright 2023 Horizon UI (https://www.horizon-ui.com/)
-
-* Designed and Coded by Simmmple
-
-=========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-*/
-
 import React, { useState } from 'react';
+import { useForm } from 'react-hook-form';
 // Chakra imports
 import {
     Box,
     Button,
-    Checkbox,
     Flex,
     FormControl,
+    FormErrorMessage,
     FormLabel,
     Heading,
     Icon,
     Input,
     InputGroup,
     InputRightElement,
-    Text,
     useColorModeValue,
+    useToast,
 } from '@chakra-ui/react';
 // Custom components
-import { HSeparator } from 'components/separator/Separator';
 import DefaultAuth from 'layouts/auth/Default';
 // Assets
 import illustration from 'assets/img/auth/auth.png';
 import { MdOutlineRemoveRedEye } from 'react-icons/md';
 import { RiEyeCloseLine } from 'react-icons/ri';
+import { login } from 'services/auth';
+import { useDispatch } from 'react-redux';
+import { loginSuccess } from 'redux/user/userSlice';
 
 function SignIn() {
     // Chakra color mode
     const textColor = useColorModeValue('navy.700', 'white');
     const textColorSecondary = 'gray.400';
-
     const [show, setShow] = useState(false);
     const handleClick = () => setShow(!show);
+    const {
+        handleSubmit,
+        register,
+        formState: { errors, isSubmitting },
+    } = useForm();
+    const dispatch = useDispatch();
+    const toast = useToast();
+
+    const onSubmit = async (values) => {
+        try {
+            const payload = {
+                username: values?.username,
+                password: values?.password,
+            };
+
+            const res = await login(payload);
+            if (res?.status === 'Success') {
+                dispatch(loginSuccess({ accessToken: res?.payload?.accessToken, username: res?.payload?.username }));
+                toast({
+                    title: res?.message,
+                    status: 'success',
+                    duration: 3000,
+                    isClosable: true,
+                    position: 'top-right',
+                });
+            } else {
+                toast({
+                    title: res?.message,
+                    status: 'error',
+                    duration: 3000,
+                    isClosable: true,
+                    position: 'top-right',
+                });
+            }
+
+            console.log(res);
+        } catch (err) {
+            console.log(err);
+        }
+    };
+
     return (
         <DefaultAuth illustrationBackground={illustration} image={illustration}>
             <Flex
@@ -84,44 +104,76 @@ function SignIn() {
                     me="auto"
                     mb={{ base: '20px', md: 'auto' }}
                 >
-                    <FormControl>
-                        <FormLabel display="flex" ms="4px" fontSize="sm" fontWeight="500" color={textColor} mb="8px">
-                            Username
-                        </FormLabel>
-                        <Input
-                            isRequired={true}
-                            variant="auth"
-                            fontSize="sm"
-                            ms={{ base: '0px', md: '0px' }}
-                            type="email"
-                            mb="24px"
-                            fontWeight="500"
-                            size="lg"
-                        />
-                        <FormLabel ms="4px" fontSize="sm" fontWeight="500" color={textColor} display="flex">
-                            Password
-                        </FormLabel>
-                        <InputGroup size="md">
-                            <Input
-                                isRequired={true}
+                    <form onSubmit={handleSubmit(onSubmit)} autoComplete="off">
+                        <FormControl isInvalid={errors.username || errors.password}>
+                            <FormLabel
+                                display="flex"
+                                ms="4px"
                                 fontSize="sm"
-                                mb="24px"
-                                size="lg"
-                                type={show ? 'text' : 'password'}
-                                variant="auth"
-                                id="password_field_1"
-                            />
-                            <InputRightElement id="password_field_2" display="flex" alignItems="center" mt="4px">
-                                <Icon
-                                    color={textColorSecondary}
-                                    _hover={{ cursor: 'pointer' }}
-                                    as={show ? RiEyeCloseLine : MdOutlineRemoveRedEye}
-                                    onClick={handleClick}
+                                fontWeight="500"
+                                color={textColor}
+                                mb="8px"
+                            >
+                                Username
+                            </FormLabel>
+                            <div style={{ paddingBottom: '28px', position: 'relative', marginBottom: '10px' }}>
+                                <Input
+                                    variant="auth"
+                                    fontSize="sm"
+                                    ms={{ base: '0px', md: '0px' }}
+                                    fontWeight="500"
+                                    size="lg"
+                                    {...register('username', {
+                                        required: 'Please fill out this field',
+                                        minLength: { value: 4, message: 'Minimum length must be bigger than be 4.' },
+                                        maxLength: { value: 20, message: 'Maximum length must be less than 20.' },
+                                        pattern: {
+                                            value: /^[a-zA-Z0-9]*$/,
+                                            message: 'Username does not contain any special character.',
+                                        },
+                                    })}
                                 />
-                            </InputRightElement>
-                        </InputGroup>
-                        <Flex justifyContent="space-between" align="center" mb="24px">
-                            {/* <FormControl display="flex" alignItems="center">
+                                <FormErrorMessage style={{ position: 'absolute', marginLeft: '4px' }}>
+                                    {errors.username && errors.username.message}
+                                </FormErrorMessage>
+                            </div>
+
+                            <FormLabel ms="4px" fontSize="sm" fontWeight="500" color={textColor} display="flex">
+                                Password
+                            </FormLabel>
+                            <InputGroup size="md" style={{ paddingBottom: '28px', position: 'relative' }}>
+                                <Input
+                                    fontSize="sm"
+                                    mb="24px"
+                                    size="lg"
+                                    type={show ? 'text' : 'password'}
+                                    variant="auth"
+                                    id="password_field_1"
+                                    {...register('password', {
+                                        required: 'Please fill out this field',
+                                        minLength: { value: 4, message: 'Minimum length must be bigger than be 4.' },
+                                        maxLength: { value: 20, message: 'Maximum length must be less than 20.' },
+                                        pattern: {
+                                            value: /^[a-zA-Z0-9@]*$/,
+                                            message: 'Password does not contain any special character.',
+                                        },
+                                    })}
+                                />
+                                <FormErrorMessage style={{ position: 'absolute', marginLeft: '4px', bottom: '26px' }}>
+                                    {errors?.password && errors.password.message}
+                                </FormErrorMessage>
+                                <InputRightElement id="password_field_2" display="flex" alignItems="center" mt="4px">
+                                    <Icon
+                                        color={textColorSecondary}
+                                        _hover={{ cursor: 'pointer' }}
+                                        as={show ? RiEyeCloseLine : MdOutlineRemoveRedEye}
+                                        onClick={handleClick}
+                                    />
+                                </InputRightElement>
+                            </InputGroup>
+
+                            <Flex justifyContent="space-between" align="center" mb="24px">
+                                {/* <FormControl display="flex" alignItems="center">
                                 <Checkbox id="remember-login" colorScheme="brandScheme" me="10px" />
                                 <FormLabel
                                     htmlFor="remember-login"
@@ -133,7 +185,7 @@ function SignIn() {
                                     Keep me logged in
                                 </FormLabel>
                             </FormControl> */}
-                            {/* <NavLink to='/auth/forgot-password'>
+                                {/* <NavLink to='/auth/forgot-password'>
                 <Text
                   color={textColorBrand}
                   fontSize='sm'
@@ -142,11 +194,21 @@ function SignIn() {
                   Forgot password?
                 </Text>
               </NavLink> */}
-                        </Flex>
-                        <Button fontSize="sm" variant="brand" fontWeight="500" w="100%" h="50" mb="24px">
-                            Sign In
-                        </Button>
-                    </FormControl>
+                            </Flex>
+                            <Button
+                                fontSize="sm"
+                                variant="brand"
+                                fontWeight="500"
+                                w="100%"
+                                h="50"
+                                mb="24px"
+                                isLoading={isSubmitting}
+                                type="submit"
+                            >
+                                Sign In
+                            </Button>
+                        </FormControl>
+                    </form>
                 </Flex>
             </Flex>
         </DefaultAuth>
