@@ -66,8 +66,6 @@ function SignIn() {
                     position: 'top-right',
                 });
             }
-
-            console.log(res);
         } catch (err) {
             console.log(err);
         }
