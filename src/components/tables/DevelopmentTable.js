@@ -19,8 +19,16 @@ import Card from 'components/card/Card';
 import { AndroidLogo, AppleLogo, WindowsLogo } from 'components/icons/Icons';
 import Menu from 'components/menu/MainMenu';
 import React, { useMemo } from 'react';
-import { useGlobalFilter, usePagination, useSortBy, useTable } from 'react-table';
-import { ArrowRightIcon, ArrowLeftIcon, ChevronRightIcon, ChevronLeftIcon } from '@chakra-ui/icons';
+import { actions, useGlobalFilter, usePagination, useSortBy, useTable } from 'react-table';
+import {
+    ArrowRightIcon,
+    ArrowLeftIcon,
+    ChevronRightIcon,
+    ChevronLeftIcon,
+    DeleteIcon,
+    AddIcon,
+    EditIcon,
+} from '@chakra-ui/icons';
 import { pageSizeOptions } from 'utils/constant';
 
 export default function DevelopmentTable(props) {
@@ -34,6 +42,10 @@ export default function DevelopmentTable(props) {
         paginationData,
         onGoToLastPage = () => {},
         onGoToFirstPage = () => {},
+        actions = [],
+        onAdd = () => {},
+        onEdit = () => {},
+        onDelete = () => {},
     } = props;
 
     const columns = useMemo(() => columnsData, [columnsData]);
@@ -65,10 +77,7 @@ export default function DevelopmentTable(props) {
     initialState.pageSize = 10;
 
     const textColor = useColorModeValue('secondaryGray.900', 'white');
-    const iconColor = useColorModeValue('secondaryGray.500', 'white');
     const borderColor = useColorModeValue('gray.200', 'whiteAlpha.100');
-
-    console.log(paginationData);
 
     return (
         <Card direction="column" w="100%" px="0px" overflowX={{ sm: 'scroll', lg: 'hidden' }}>
@@ -109,6 +118,7 @@ export default function DevelopmentTable(props) {
                         return (
                             <Tr {...row.getRowProps()} key={index}>
                                 {row.cells.map((cell, index) => {
+                                    console.log(cell);
                                     let data = '';
                                     if (cell.column?.type === 'string') {
                                         data = (
@@ -135,6 +145,63 @@ export default function DevelopmentTable(props) {
                                                     w="63px"
                                                     value={cell.value}
                                                 />
+                                            </Flex>
+                                        );
+                                    } else if (cell.column.key === 'action') {
+                                        data = (
+                                            <Flex align="center">
+                                                {actions?.map((item, i) => {
+                                                    if (item?.type === 'delete') {
+                                                        return (
+                                                            <Tooltip label={item.type} key={i}>
+                                                                <DeleteIcon
+                                                                    color={'red.500'}
+                                                                    me="16px"
+                                                                    h="18px"
+                                                                    w="18px"
+                                                                    style={{ cursor: 'pointer' }}
+                                                                    onClick={() => {
+                                                                        onDelete(item.type);
+                                                                    }}
+                                                                />
+                                                            </Tooltip>
+                                                        );
+                                                    }
+
+                                                    if (item?.type === 'add') {
+                                                        return (
+                                                            <Tooltip label={item.type} key={i}>
+                                                                <AddIcon
+                                                                    color={'green.500'}
+                                                                    me="16px"
+                                                                    h="18px"
+                                                                    w="18px"
+                                                                    style={{ cursor: 'pointer' }}
+                                                                    onClick={() => {
+                                                                        onAdd(item.type);
+                                                                    }}
+                                                                />
+                                                            </Tooltip>
+                                                        );
+                                                    }
+
+                                                    if (item?.type === 'edit') {
+                                                        return (
+                                                            <Tooltip label={item.type} key={i}>
+                                                                <EditIcon
+                                                                    color={'blue.500'}
+                                                                    me="16px"
+                                                                    h="18px"
+                                                                    w="18px"
+                                                                    style={{ cursor: 'pointer' }}
+                                                                    onClick={() => {
+                                                                        onEdit(item.type);
+                                                                    }}
+                                                                />
+                                                            </Tooltip>
+                                                        );
+                                                    }
+                                                })}
                                             </Flex>
                                         );
                                     }

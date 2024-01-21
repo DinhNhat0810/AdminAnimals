@@ -1,4 +1,4 @@
-export const columnsDataDevelopment = [
+export const columns = [
     {
         Header: 'Name Vi',
         key: 'nameVi',
@@ -23,5 +23,10 @@ export const columnsDataDevelopment = [
         Header: 'Size',
         key: 'size',
         type: 'string',
+    },
+    {
+        Header: 'Action',
+        key: 'action',
+        type: 'action',
     },
 ];

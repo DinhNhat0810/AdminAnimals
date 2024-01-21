@@ -8,12 +8,12 @@ import { Provider } from 'react-redux';
 import store from 'app/store';
 
 ReactDOM.render(
-    <Provider store={store}>
-        <ChakraProvider theme={theme}>
+    <ChakraProvider theme={theme}>
+        <Provider store={store}>
             <React.StrictMode>
                 <App />
             </React.StrictMode>
-        </ChakraProvider>
-    </Provider>,
+        </Provider>
+    </ChakraProvider>,
     document.getElementById('root'),
 );

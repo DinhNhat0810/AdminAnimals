@@ -1,11 +1,24 @@
 // Chakra imports
 import { Box, SimpleGrid } from '@chakra-ui/react';
 import DevelopmentTable from 'components/tables/DevelopmentTable';
-import { columnsDataDevelopment } from 'views/admin/animals/variables/columnsData';
+import { columns } from 'views/admin/animals/variables/columnsData';
 
 import { useEffect, useState } from 'react';
 import { getAllAnimals } from 'services/animals';
 import Loading from 'components/loading/Loading';
+import CustomModal from 'components/modal/Modal';
+
+const actions = [
+    {
+        type: 'add',
+    },
+    {
+        type: 'edit',
+    },
+    {
+        type: 'delete',
+    },
+];
 
 export default function Settings() {
     const [dataTable, setDatatable] = useState([]);
@@ -23,6 +36,32 @@ export default function Settings() {
         totalPages: 0,
     });
     const [loading, setLoading] = useState(false);
+    const [openAddModal, setOpenAddModal] = useState(false);
+
+    const handleDeleteAnimal = async (value) => {
+        try {
+            console.log(value);
+        } catch (err) {
+            console.log(err);
+        }
+    };
+
+    const handleEditAnimal = async (value) => {
+        try {
+            console.log(value);
+        } catch (err) {
+            console.log(err);
+        }
+    };
+
+    const handleAddAnimal = async (value) => {
+        try {
+            setOpenAddModal(true);
+            console.log(value);
+        } catch (err) {
+            console.log(err);
+        }
+    };
 
     const getAnimals = async () => {
         try {
@@ -78,9 +117,11 @@ export default function Settings() {
     return (
         <Box pt={{ base: '130px', md: '80px', xl: '80px' }}>
             <Loading loading={loading} />
+            <CustomModal isOpen={openAddModal} onClose={() => setOpenAddModal(false)} />
+
             <SimpleGrid mb="20px" columns={{ sm: 1, md: 1 }} spacing={{ base: '20px', xl: '20px' }}>
                 <DevelopmentTable
-                    columnsData={columnsDataDevelopment}
+                    columnsData={columns}
                     tableData={dataTable}
                     isPagination
                     onChangePageSize={handleChangePageSize}
@@ -89,6 +130,10 @@ export default function Settings() {
                     paginationData={paginationData}
                     onGoToLastPage={handleGoToLastPage}
                     onGoToFirstPage={handleGoToFirstPage}
+                    actions={actions}
+                    onDelete={handleDeleteAnimal}
+                    onEdit={handleEditAnimal}
+                    onAdd={handleAddAnimal}
                 />
             </SimpleGrid>
         </Box>

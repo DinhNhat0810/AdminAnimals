@@ -2,7 +2,6 @@ import { Fragment } from 'react';
 import { BrowserRouter, Route, Switch, Redirect } from 'react-router-dom';
 import AuthLayout from 'layouts/auth';
 import AdminLayout from 'layouts/admin';
-import RtlLayout from 'layouts/rtl';
 import routes from 'routes';
 import ProtectedRoute from 'components/ProtectedRoute';
 import { useSelector } from 'react-redux';
@@ -22,8 +21,6 @@ function App() {
                     let Layout = AuthLayout;
                     if (route.layout === '/admin') {
                         Layout = AdminLayout;
-                    } else if (route.layout === '/rtl') {
-                        Layout = RtlLayout;
                     }
 
                     const Page = route.component;
