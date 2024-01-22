@@ -1,17 +1,28 @@
 // Chakra imports
-import { Box, SimpleGrid } from '@chakra-ui/react';
+import {
+    Box,
+    Button,
+    Flex,
+    FormControl,
+    FormErrorMessage,
+    FormLabel,
+    Input,
+    ModalFooter,
+    SimpleGrid,
+    toast,
+    useToast,
+} from '@chakra-ui/react';
 import DevelopmentTable from 'components/tables/DevelopmentTable';
-import { columns } from 'views/admin/animals/variables/columnsData';
-
+import { columns, addFields } from 'views/admin/animals/variables/columnsData';
 import { useEffect, useState } from 'react';
 import { getAllAnimals } from 'services/animals';
 import Loading from 'components/loading/Loading';
 import CustomModal from 'components/modal/Modal';
+import CustomInput from 'components/customInput/CustomInput';
+import { useForm } from 'react-hook-form';
+import { addAnimal } from 'services/animals';
 
 const actions = [
-    {
-        type: 'add',
-    },
     {
         type: 'edit',
     },
@@ -20,7 +31,67 @@ const actions = [
     },
 ];
 
+const ContentAddModal = (props) => {
+    const { onClose = () => {}, onSave = () => {} } = props;
+    const {
+        handleSubmit,
+        register,
+        formState: { errors, isSubmitting },
+    } = useForm();
+
+    const onSubmit = (values) => {
+        onSave(values);
+    };
+
+    return (
+        <Box p={4}>
+            <form autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
+                <FormControl style={{ display: 'flex', flexWrap: 'wrap' }}>
+                    {addFields?.map((item, index) => {
+                        return (
+                            <FormControl
+                                key={index}
+                                style={{ width: '50%', padding: '0px 16px' }}
+                                isInvalid={item?.required && errors[item?.key]}
+                                isRequired={item?.required}
+                            >
+                                <CustomInput
+                                    label={item?.label}
+                                    placeholder={item?.label}
+                                    isRequired={item?.required}
+                                    messageError={item?.required && errors[item?.key] && errors[item?.key]?.message}
+                                    type={item?.type}
+                                    register={register}
+                                    name={item?.key}
+                                    id={index}
+                                    rules={item?.rules}
+                                />
+                            </FormControl>
+                        );
+                    })}
+
+                    <ModalFooter w={'100%'}>
+                        <Button
+                            style={{ borderRadius: '8px' }}
+                            type="submit"
+                            colorScheme="blue"
+                            mr={4}
+                            isLoading={isSubmitting}
+                        >
+                            Add
+                        </Button>
+                        <Button style={{ borderRadius: '8px' }} variant="outline" onClick={onClose}>
+                            Cancel
+                        </Button>
+                    </ModalFooter>
+                </FormControl>
+            </form>
+        </Box>
+    );
+};
+
 export default function Settings() {
+    const toast = useToast();
     const [dataTable, setDatatable] = useState([]);
     const [params, setParams] = useState({
         page: 1,
@@ -113,11 +184,52 @@ export default function Settings() {
         setParams((prev) => ({ ...prev, page: 1 }));
     };
 
+    const handleSave = async (values) => {
+        try {
+            setLoading(true);
+            const payload = {
+                ...values,
+            };
+
+            const res = await addAnimal(payload);
+            if (res?.status === 'success') {
+                toast({
+                    title: res?.message,
+                    status: 'success',
+                    duration: 3000,
+                    isClosable: true,
+                    position: 'top-right',
+                });
+                getAnimals();
+                setOpenAddModal(false);
+            } else {
+                toast({
+                    title: res?.message,
+                    status: 'error',
+                    duration: 3000,
+                    isClosable: true,
+                    position: 'top-right',
+                });
+                setLoading(false);
+            }
+        } catch (err) {
+            console.log(err);
+            setLoading(false);
+        }
+    };
+
     // Chakra Color Mode
     return (
         <Box pt={{ base: '130px', md: '80px', xl: '80px' }}>
             <Loading loading={loading} />
-            <CustomModal isOpen={openAddModal} onClose={() => setOpenAddModal(false)} />
+            <CustomModal
+                isOpen={openAddModal}
+                onClose={() => setOpenAddModal(false)}
+                content={<ContentAddModal onSave={handleSave} onClose={() => setOpenAddModal(false)} />}
+                size="6xl"
+                title="Add animal"
+                hideFooter={true}
+            />
 
             <SimpleGrid mb="20px" columns={{ sm: 1, md: 1 }} spacing={{ base: '20px', xl: '20px' }}>
                 <DevelopmentTable
@@ -134,6 +246,18 @@ export default function Settings() {
                     onDelete={handleDeleteAnimal}
                     onEdit={handleEditAnimal}
                     onAdd={handleAddAnimal}
+                    optionsHeader={
+                        <Flex justifyContent={'flex-end'} mb={4}>
+                            <Button
+                                onClick={() => {
+                                    setOpenAddModal(true);
+                                }}
+                                style={{ borderRadius: '8px', backgroundColor: '#422afb', color: '#fff' }}
+                            >
+                                Add
+                            </Button>
+                        </Flex>
+                    }
                 />
             </SimpleGrid>
         </Box>

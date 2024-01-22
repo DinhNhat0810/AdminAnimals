@@ -19,7 +19,7 @@ import { useRef, useState } from 'react';
 function CustomModal(props) {
     const {
         title = 'Modal',
-        onOpen = () => {},
+        onSave = () => {},
         onClose = () => {},
         isOpen,
         initialRef,
@@ -34,6 +34,8 @@ function CustomModal(props) {
         content,
         styleModal,
         closeOnEsc,
+        isSubmitting,
+        hideFooter = false,
     } = props;
 
     return (
@@ -50,21 +52,30 @@ function CustomModal(props) {
             >
                 <ModalOverlay />
                 <ModalContent>
-                    <ModalHeader>{title}</ModalHeader>
+                    <ModalHeader fontSize={28}>{title}</ModalHeader>
                     {!isHideCloseBtn && <ModalCloseButton />}
                     {content}
-                    <ModalFooter>
-                        {!isHideOkBtn && (
-                            <Button style={{ borderRadius: '8px' }} colorScheme="blue" mr={4}>
-                                {labelOkBtn}
-                            </Button>
-                        )}
-                        {!isHideCancelBtn && (
-                            <Button style={{ borderRadius: '8px' }} variant="outline" onClick={onClose}>
-                                {labelCancelBtn}
-                            </Button>
-                        )}
-                    </ModalFooter>
+
+                    {!hideFooter && (
+                        <ModalFooter>
+                            {!isHideOkBtn && (
+                                <Button
+                                    style={{ borderRadius: '8px' }}
+                                    colorScheme="blue"
+                                    mr={4}
+                                    onClick={onSave}
+                                    isLoading={isSubmitting}
+                                >
+                                    {labelOkBtn}
+                                </Button>
+                            )}
+                            {!isHideCancelBtn && (
+                                <Button style={{ borderRadius: '8px' }} variant="outline" onClick={onClose}>
+                                    {labelCancelBtn}
+                                </Button>
+                            )}
+                        </ModalFooter>
+                    )}
                 </ModalContent>
             </Modal>
         </>

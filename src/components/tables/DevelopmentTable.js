@@ -13,6 +13,7 @@ import {
     useColorModeValue,
     Tooltip,
     IconButton,
+    Button,
 } from '@chakra-ui/react';
 // Custom components
 import Card from 'components/card/Card';
@@ -46,6 +47,7 @@ export default function DevelopmentTable(props) {
         onAdd = () => {},
         onEdit = () => {},
         onDelete = () => {},
+        optionsHeader,
     } = props;
 
     const columns = useMemo(() => columnsData, [columnsData]);
@@ -81,11 +83,8 @@ export default function DevelopmentTable(props) {
 
     return (
         <Card direction="column" w="100%" px="0px" overflowX={{ sm: 'scroll', lg: 'hidden' }}>
-            <Flex px="25px" justify="space-between" mb="20px" align="center">
-                {/* <Text color={textColor} fontSize="22px" fontWeight="700" lineHeight="100%">
-                    Development Table
-                </Text>
-                <Menu /> */}
+            <Flex px="25px" justify="flex-end" mb="10px" align="center">
+                {optionsHeader}
             </Flex>
             <Table {...getTableProps()} variant="simple" color="gray.500" mb="24px">
                 <Thead>
@@ -118,7 +117,7 @@ export default function DevelopmentTable(props) {
                         return (
                             <Tr {...row.getRowProps()} key={index}>
                                 {row.cells.map((cell, index) => {
-                                    console.log(cell);
+                                    // console.log(cell);
                                     let data = '';
                                     if (cell.column?.type === 'string') {
                                         data = (

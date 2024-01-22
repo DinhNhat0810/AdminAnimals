@@ -10,3 +10,12 @@ export const getAllAnimals = async (params, callback = () => {}, config) => {
         callback(error);
     }
 };
+
+export const addAnimal = async (payload, callback = () => {}, config) => {
+    try {
+        const res = await httpRequest.post('animals/create', payload, config);
+        return res?.data;
+    } catch (error) {
+        callback(error);
+    }
+};
