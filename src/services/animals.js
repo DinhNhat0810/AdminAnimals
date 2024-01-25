@@ -19,3 +19,12 @@ export const addAnimal = async (payload, callback = () => {}, config) => {
         callback(error);
     }
 };
+
+export const updateAnimal = async (id, payload, callback = () => {}, config) => {
+    try {
+        const res = await httpRequest.put('animals/update/' + id, payload, config);
+        return res?.data;
+    } catch (error) {
+        callback(error);
+    }
+};

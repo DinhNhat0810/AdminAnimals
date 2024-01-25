@@ -20,7 +20,8 @@ import Loading from 'components/loading/Loading';
 import CustomModal from 'components/modal/Modal';
 import CustomInput from 'components/customInput/CustomInput';
 import { useForm } from 'react-hook-form';
-import { addAnimal } from 'services/animals';
+import { addAnimal, updateAnimal } from 'services/animals';
+import moment from 'moment';
 
 const actions = [
     {
@@ -31,27 +32,39 @@ const actions = [
     },
 ];
 
-const ContentAddModal = (props) => {
-    const { onClose = () => {}, onSave = () => {} } = props;
+const ContentModal = (props) => {
+    const { onClose = () => {}, onSave = () => {}, isEdit, dataDetail } = props;
     const {
         handleSubmit,
         register,
+        setValue,
+        trigger,
+        reset,
         formState: { errors, isSubmitting },
     } = useForm();
 
     const onSubmit = (values) => {
-        onSave(values);
+        onSave(values, reset);
     };
+
+    useEffect(() => {
+        if (dataDetail && isEdit) {
+            for (let key in dataDetail) {
+                setValue(key, dataDetail[key]);
+            }
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [dataDetail]);
 
     return (
         <Box p={4}>
-            <form autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
+            <form autoComplete="off" onSubmit={handleSubmit(onSubmit)} noValidate>
                 <FormControl style={{ display: 'flex', flexWrap: 'wrap' }}>
                     {addFields?.map((item, index) => {
                         return (
                             <FormControl
                                 key={index}
-                                style={{ width: '50%', padding: '0px 16px' }}
+                                style={{ width: item?.width, padding: '0px 16px', height: item?.height }}
                                 isInvalid={item?.required && errors[item?.key]}
                                 isRequired={item?.required}
                             >
@@ -65,6 +78,9 @@ const ContentAddModal = (props) => {
                                     name={item?.key}
                                     id={index}
                                     rules={item?.rules}
+                                    setValue={setValue}
+                                    trigger={trigger}
+                                    dataInput={isEdit ? dataDetail[item?.key] : ''}
                                 />
                             </FormControl>
                         );
@@ -78,7 +94,7 @@ const ContentAddModal = (props) => {
                             mr={4}
                             isLoading={isSubmitting}
                         >
-                            Add
+                            Save
                         </Button>
                         <Button style={{ borderRadius: '8px' }} variant="outline" onClick={onClose}>
                             Cancel
@@ -108,6 +124,10 @@ export default function Settings() {
     });
     const [loading, setLoading] = useState(false);
     const [openAddModal, setOpenAddModal] = useState(false);
+    const [titleModal, setTitleModal] = useState('Add');
+    const [isEdit, setIsEdit] = useState(false);
+    const [dataDetail, setDataDetail] = useState(null);
+    const [checkBox, setCheckbox] = useState([]);
 
     const handleDeleteAnimal = async (value) => {
         try {
@@ -120,6 +140,10 @@ export default function Settings() {
     const handleEditAnimal = async (value) => {
         try {
             console.log(value);
+            setDataDetail(value);
+            setTitleModal('Edit animal');
+            setIsEdit(true);
+            setOpenAddModal(true);
         } catch (err) {
             console.log(err);
         }
@@ -127,8 +151,9 @@ export default function Settings() {
 
     const handleAddAnimal = async (value) => {
         try {
+            setTitleModal('Add animal');
+            setIsEdit(false);
             setOpenAddModal(true);
-            console.log(value);
         } catch (err) {
             console.log(err);
         }
@@ -139,7 +164,13 @@ export default function Settings() {
             setLoading(true);
             const res = await getAllAnimals(params);
             if (res?.payload?.docs) {
-                setDatatable(res?.payload?.docs);
+                const newRes = res?.payload?.docs?.map((item) => {
+                    return {
+                        ...item,
+                        // updatedAt: moment(item?.updatedAt, 'DD/MM/YYYY').format(''),
+                    };
+                });
+                setDatatable(newRes);
                 setDataPagination({
                     currentPage: res?.payload?.currentPage,
                     hasNextPage: res?.payload?.hasNextPage,
@@ -184,14 +215,20 @@ export default function Settings() {
         setParams((prev) => ({ ...prev, page: 1 }));
     };
 
-    const handleSave = async (values) => {
+    const handleSave = async (values, reset) => {
         try {
             setLoading(true);
             const payload = {
                 ...values,
             };
+            let res;
 
-            const res = await addAnimal(payload);
+            if (isEdit) {
+                res = await updateAnimal(payload?._id, payload);
+            } else {
+                res = await addAnimal(payload);
+            }
+
             if (res?.status === 'success') {
                 toast({
                     title: res?.message,
@@ -201,6 +238,7 @@ export default function Settings() {
                     position: 'top-right',
                 });
                 getAnimals();
+                reset();
                 setOpenAddModal(false);
             } else {
                 toast({
@@ -212,10 +250,17 @@ export default function Settings() {
                 });
                 setLoading(false);
             }
+
+            console.log(values);
         } catch (err) {
             console.log(err);
             setLoading(false);
         }
+    };
+
+    const handleGetCheckbox = (value) => {
+        const ids = value?.map((item) => item._id);
+        console.log(ids);
     };
 
     // Chakra Color Mode
@@ -225,9 +270,16 @@ export default function Settings() {
             <CustomModal
                 isOpen={openAddModal}
                 onClose={() => setOpenAddModal(false)}
-                content={<ContentAddModal onSave={handleSave} onClose={() => setOpenAddModal(false)} />}
+                content={
+                    <ContentModal
+                        isEdit={isEdit}
+                        dataDetail={dataDetail}
+                        onSave={handleSave}
+                        onClose={() => setOpenAddModal(false)}
+                    />
+                }
                 size="6xl"
-                title="Add animal"
+                title={titleModal}
                 hideFooter={true}
             />
 
@@ -245,12 +297,21 @@ export default function Settings() {
                     actions={actions}
                     onDelete={handleDeleteAnimal}
                     onEdit={handleEditAnimal}
-                    onAdd={handleAddAnimal}
+                    onGetCheckBox={handleGetCheckbox}
                     optionsHeader={
-                        <Flex justifyContent={'flex-end'} mb={4}>
+                        <Flex justifyContent={'space-between'} mb={4}>
                             <Button
                                 onClick={() => {
-                                    setOpenAddModal(true);
+                                    console.log(checkBox);
+                                }}
+                                style={{ borderRadius: '8px', backgroundColor: '#422afb', color: '#fff' }}
+                            >
+                                Delete
+                            </Button>
+
+                            <Button
+                                onClick={() => {
+                                    handleAddAnimal();
                                 }}
                                 style={{ borderRadius: '8px', backgroundColor: '#422afb', color: '#fff' }}
                             >

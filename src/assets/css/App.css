@@ -6,3 +6,12 @@ body {
 option {
   color: black;
 }
+
+.ck-editor__editable_inline:not(.ck-comment__input *) {
+  height: 300px;
+  overflow-y: auto;
+}
+
+.css-9n5vx8 {
+  overflow: hidden !important;
+}

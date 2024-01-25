@@ -2,6 +2,7 @@
 import { Flex, FormErrorMessage, FormLabel, Input, Text, useColorModeValue } from '@chakra-ui/react';
 // Custom components
 import React from 'react';
+import CheckEditor from './CheckEditor';
 
 const CustomInput = (props) => {
     const {
@@ -15,6 +16,9 @@ const CustomInput = (props) => {
         rules = {},
         register,
         name,
+        setValue = () => {},
+        trigger = () => {},
+        dataInput,
         id,
         ...rest
     } = props;
@@ -29,15 +33,25 @@ const CustomInput = (props) => {
             </FormLabel>
 
             <div style={{ paddingBottom: '28px', position: 'relative', marginBottom: '10px' }}>
-                <Input
-                    {...rest}
-                    type={type}
-                    fontWeight="500"
-                    placeholder={placeholder}
-                    {...register(name, rules)}
-                    _placeholder={{ fontWeight: '400', color: 'secondaryGray.600' }}
-                />
-
+                {type === 'editor' ? (
+                    <CheckEditor
+                        dataEditor={dataInput}
+                        register={register}
+                        setValue={setValue}
+                        name={name}
+                        rules={rules}
+                        trigger={trigger}
+                    />
+                ) : (
+                    <Input
+                        {...rest}
+                        type={type}
+                        fontWeight="500"
+                        placeholder={placeholder}
+                        {...register(name, rules)}
+                        _placeholder={{ fontWeight: '400', color: 'secondaryGray.600' }}
+                    />
+                )}
                 {isRequired && (
                     <FormErrorMessage style={{ position: 'absolute', marginLeft: '4px' }}>
                         {messageError}
