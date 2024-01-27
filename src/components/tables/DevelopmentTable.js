@@ -111,7 +111,7 @@ export default function DevelopmentTable(props) {
 
     return (
         <Card direction="column" w="100%" px="0px" overflowX={{ sm: 'scroll', lg: 'hidden' }}>
-            <Flex px="25px" justify="flex-end" mb="10px" align="center">
+            <Flex px="25px" mb="10px" align="center">
                 {optionsHeader}
             </Flex>
             <Flex overflow="auto">
@@ -229,7 +229,7 @@ export default function DevelopmentTable(props) {
                                                                         w="18px"
                                                                         style={{ cursor: 'pointer' }}
                                                                         onClick={() => {
-                                                                            onDelete(item.type);
+                                                                            onDelete([cell?.row?.original?._id]);
                                                                         }}
                                                                     />
                                                                 </Tooltip>

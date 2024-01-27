@@ -27,3 +27,7 @@ export const convertToVnd = (number) => {
 
     return 0;
 };
+
+export const isNonEmptyArray = (arr) => {
+    return Array.isArray(arr) && arr?.length > 0;
+};

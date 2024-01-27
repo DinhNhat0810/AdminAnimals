@@ -22,6 +22,9 @@ import CustomInput from 'components/customInput/CustomInput';
 import { useForm } from 'react-hook-form';
 import { addAnimal, updateAnimal } from 'services/animals';
 import moment from 'moment';
+import { removeAnimal } from 'services/animals';
+import { deleteAnimal } from 'services/animals';
+import { isNonEmptyArray } from 'utils/common';
 
 const actions = [
     {
@@ -123,17 +126,48 @@ export default function Settings() {
         totalPages: 0,
     });
     const [loading, setLoading] = useState(false);
-    const [openAddModal, setOpenAddModal] = useState(false);
     const [titleModal, setTitleModal] = useState('Add');
     const [isEdit, setIsEdit] = useState(false);
     const [dataDetail, setDataDetail] = useState(null);
     const [checkBox, setCheckbox] = useState([]);
+    const [recordDeleteId, setRecordDeleteId] = useState(null);
+    const [openAddModal, setOpenAddModal] = useState(false);
+    const [openDeleteModal, setOpenDeleteModal] = useState(false);
 
     const handleDeleteAnimal = async (value) => {
         try {
-            console.log(value);
+            let payload = { ids: [...value] };
+
+            if (isNonEmptyArray(recordDeleteId)) {
+                payload = { ids: [...recordDeleteId] };
+            }
+            setLoading(true);
+            const res = await removeAnimal(payload);
+
+            if (res?.status === 'success') {
+                toast({
+                    title: res?.message,
+                    status: 'success',
+                    duration: 3000,
+                    isClosable: true,
+                    position: 'top-right',
+                });
+                setOpenDeleteModal(false);
+                getAnimals();
+            } else {
+                toast({
+                    title: res?.message,
+                    status: 'error',
+                    duration: 3000,
+                    isClosable: true,
+                    position: 'top-right',
+                });
+                setLoading(false);
+            }
+            console.log(res);
         } catch (err) {
             console.log(err);
+            setLoading(false);
         }
     };
 
@@ -260,7 +294,7 @@ export default function Settings() {
 
     const handleGetCheckbox = (value) => {
         const ids = value?.map((item) => item._id);
-        console.log(ids);
+        setCheckbox(ids);
     };
 
     // Chakra Color Mode
@@ -283,6 +317,16 @@ export default function Settings() {
                 hideFooter={true}
             />
 
+            <CustomModal
+                isOpen={openDeleteModal}
+                onClose={() => {
+                    setOpenDeleteModal(false);
+                }}
+                content={<p style={{ marginLeft: '24px' }}>Are you sure you want to delete?</p>}
+                title={'Confirm Delete'}
+                onSave={() => handleDeleteAnimal(checkBox)}
+            />
+
             <SimpleGrid mb="20px" columns={{ sm: 1, md: 1 }} spacing={{ base: '20px', xl: '20px' }}>
                 <DevelopmentTable
                     columnsData={columns}
@@ -295,16 +339,18 @@ export default function Settings() {
                     onGoToLastPage={handleGoToLastPage}
                     onGoToFirstPage={handleGoToFirstPage}
                     actions={actions}
-                    onDelete={handleDeleteAnimal}
+                    onDelete={(value) => {
+                        setRecordDeleteId(value);
+                        setOpenDeleteModal(true);
+                    }}
                     onEdit={handleEditAnimal}
                     onGetCheckBox={handleGetCheckbox}
                     optionsHeader={
-                        <Flex justifyContent={'space-between'} mb={4}>
+                        <Flex justifyContent={'space-between'} w={'100%'} mb={4}>
                             <Button
-                                onClick={() => {
-                                    console.log(checkBox);
-                                }}
-                                style={{ borderRadius: '8px', backgroundColor: '#422afb', color: '#fff' }}
+                                onClick={() => setOpenDeleteModal(true)}
+                                style={{ borderRadius: '8px', background: 'red', color: '#fff' }}
+                                isDisabled={!isNonEmptyArray(checkBox)}
                             >
                                 Delete
                             </Button>
@@ -313,7 +359,7 @@ export default function Settings() {
                                 onClick={() => {
                                     handleAddAnimal();
                                 }}
-                                style={{ borderRadius: '8px', backgroundColor: '#422afb', color: '#fff' }}
+                                style={{ borderRadius: '8px', background: 'green', color: '#fff' }}
                             >
                                 Add
                             </Button>

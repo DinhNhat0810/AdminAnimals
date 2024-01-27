@@ -28,3 +28,21 @@ export const updateAnimal = async (id, payload, callback = () => {}, config) => 
         callback(error);
     }
 };
+
+export const removeAnimal = async (payload, callback = () => {}, config) => {
+    try {
+        const res = await httpRequest.put('animals/remove', payload, config);
+        return res?.data;
+    } catch (error) {
+        callback(error);
+    }
+};
+
+export const deleteAnimal = async (payload, callback = () => {}, config) => {
+    try {
+        const res = await httpRequest.put('animals/force-delete', payload, config);
+        return res?.data;
+    } catch (error) {
+        callback(error);
+    }
+};
