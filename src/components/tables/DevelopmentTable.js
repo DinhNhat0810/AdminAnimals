@@ -33,6 +33,7 @@ import {
 } from '@chakra-ui/icons';
 import { pageSizeOptions } from 'utils/constant';
 import moment from 'moment';
+import { isNonEmptyArray } from 'utils/common';
 
 export default function DevelopmentTable(props) {
     const {
@@ -145,7 +146,10 @@ export default function DevelopmentTable(props) {
                                                         onChange={(event) => {
                                                             handleCheckAll(event.target.checked);
                                                         }}
-                                                        isChecked={checked.every((checkbox) => checkbox?.checked)}
+                                                        isChecked={
+                                                            isNonEmptyArray(checked) &&
+                                                            checked.every((checkbox) => checkbox?.checked)
+                                                        }
                                                         colorScheme="brandScheme"
                                                         me="10px"
                                                         style={{ marginLeft: '10px' }}
