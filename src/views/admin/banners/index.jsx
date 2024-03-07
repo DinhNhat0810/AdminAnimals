@@ -13,18 +13,16 @@ import {
     useToast,
 } from '@chakra-ui/react';
 import DevelopmentTable from 'components/tables/DevelopmentTable';
-import { columns, addFields } from 'views/admin/animals/variables/columnsData';
 import { useEffect, useState } from 'react';
 import { getAllAnimals } from 'services/animals';
 import Loading from 'components/loading/Loading';
 import CustomModal from 'components/modal/Modal';
 import CustomInput from 'components/customInput/CustomInput';
 import { useForm } from 'react-hook-form';
-import { addAnimal, updateAnimal } from 'services/animals';
-import moment from 'moment';
 import { removeAnimal } from 'services/animals';
-import { deleteAnimal } from 'services/animals';
 import { isNonEmptyArray } from 'utils/common';
+import { addFields, columns } from './variables/columnsData';
+import { addBanner, updateBanner, getAllBanners, deleteBanner } from 'services/banners';
 
 const actions = [
     {
@@ -134,15 +132,11 @@ export default function Settings() {
     const [openAddModal, setOpenAddModal] = useState(false);
     const [openDeleteModal, setOpenDeleteModal] = useState(false);
 
-    const handleDeleteAnimal = async (value) => {
+    const handleDeleteBanner = async (value) => {
         try {
-            let payload = { ids: [...value] };
-
-            if (isNonEmptyArray(recordDeleteId)) {
-                payload = { ids: [...recordDeleteId] };
-            }
+            console.log(value);
             setLoading(true);
-            const res = await removeAnimal(payload);
+            const res = await deleteBanner(value);
 
             if (res?.status === 'success') {
                 toast({
@@ -153,7 +147,7 @@ export default function Settings() {
                     position: 'top-right',
                 });
                 setOpenDeleteModal(false);
-                getAnimals();
+                getBanners();
             } else {
                 toast({
                     title: res?.message,
@@ -193,10 +187,10 @@ export default function Settings() {
         }
     };
 
-    const getAnimals = async () => {
+    const getBanners = async () => {
         try {
             setLoading(true);
-            const res = await getAllAnimals(params);
+            const res = await getAllBanners(params);
             if (res?.payload?.docs) {
                 const newRes = res?.payload?.docs?.map((item) => {
                     return {
@@ -222,7 +216,7 @@ export default function Settings() {
     };
 
     useEffect(() => {
-        getAnimals();
+        getBanners();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [params]);
 
@@ -258,9 +252,9 @@ export default function Settings() {
             let res;
 
             if (isEdit) {
-                res = await updateAnimal(payload?._id, payload);
+                res = await updateBanner(payload?._id, payload);
             } else {
-                res = await addAnimal(payload);
+                res = await addBanner(payload);
             }
 
             if (res?.status === 'success') {
@@ -271,7 +265,7 @@ export default function Settings() {
                     isClosable: true,
                     position: 'top-right',
                 });
-                getAnimals();
+                getBanners();
                 reset();
                 setOpenAddModal(false);
             } else {
@@ -322,7 +316,7 @@ export default function Settings() {
                 }}
                 content={<p style={{ marginLeft: '24px' }}>Are you sure you want to delete?</p>}
                 title={'Confirm Delete'}
-                onSave={() => handleDeleteAnimal(checkBox)}
+                onSave={() => handleDeleteBanner(recordDeleteId)}
             />
 
             <SimpleGrid mb="20px" columns={{ sm: 1, md: 1 }} spacing={{ base: '20px', xl: '20px' }}>
@@ -344,15 +338,7 @@ export default function Settings() {
                     onEdit={handleEditAnimal}
                     onGetCheckBox={handleGetCheckbox}
                     optionsHeader={
-                        <Flex justifyContent={'space-between'} w={'100%'} mb={4}>
-                            <Button
-                                onClick={() => setOpenDeleteModal(true)}
-                                style={{ borderRadius: '8px', background: 'red', color: '#fff' }}
-                                isDisabled={!isNonEmptyArray(checkBox)}
-                            >
-                                Delete
-                            </Button>
-
+                        <Flex justifyContent={'flex-end'} w={'100%'} mb={4}>
                             <Button
                                 onClick={() => {
                                     handleAddAnimal();

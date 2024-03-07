@@ -1,8 +1,19 @@
 // Chakra imports
-import { Flex, FormErrorMessage, FormLabel, Input, Text, useColorModeValue } from '@chakra-ui/react';
+import {
+    Button,
+    Flex,
+    FormErrorMessage,
+    FormLabel,
+    Input,
+    InputRightElement,
+    Spinner,
+    Text,
+    useColorModeValue,
+} from '@chakra-ui/react';
 // Custom components
-import React from 'react';
+import React, { useState } from 'react';
 import CheckEditor from './CheckEditor';
+import UploadImg from './UploadImg';
 
 const CustomInput = (props) => {
     const {
@@ -33,7 +44,7 @@ const CustomInput = (props) => {
             </FormLabel>
 
             <div style={{ paddingBottom: '28px', position: 'relative', marginBottom: '10px' }}>
-                {type === 'editor' ? (
+                {type === 'editor' && (
                     <CheckEditor
                         dataEditor={dataInput}
                         register={register}
@@ -42,7 +53,11 @@ const CustomInput = (props) => {
                         rules={rules}
                         trigger={trigger}
                     />
-                ) : (
+                )}
+
+                {type === 'uploadImg' && <UploadImg setValue={setValue} name={name} dataInput={dataInput} />}
+
+                {type === 'string' && (
                     <Input
                         {...rest}
                         type={type}
@@ -52,6 +67,7 @@ const CustomInput = (props) => {
                         _placeholder={{ fontWeight: '400', color: 'secondaryGray.600' }}
                     />
                 )}
+
                 {isRequired && (
                     <FormErrorMessage style={{ position: 'absolute', marginLeft: '4px' }}>
                         {messageError}

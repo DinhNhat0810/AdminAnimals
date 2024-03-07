@@ -4,10 +4,17 @@ const httpRequest = axios.create({
     baseURL: process.env.REACT_APP_URL,
 });
 
-const token = JSON.parse(localStorage.getItem('user'))?.accessToken;
-
-httpRequest.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-httpRequest.defaults.headers.common['token'] = `Bearer ${token}`;
+httpRequest.interceptors.request.use(
+    (config) => {
+        const token = JSON.parse(localStorage.getItem('user'))?.accessToken;
+        config.headers.Authorization = `Bearer ${token}`;
+        config.headers.token = `Bearer ${token}`;
+        return config;
+    },
+    (error) => {
+        return Promise.reject(error);
+    },
+);
 
 export const get = async (path, options = {}, config) => {
     const response = await httpRequest.get(path, options, config);

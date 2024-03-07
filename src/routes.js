@@ -1,7 +1,15 @@
 import React from 'react';
 
 import { Icon } from '@chakra-ui/react';
-import { MdBarChart, MdPerson, MdHome, MdLock, MdOutlineShoppingCart, MdOutlinePets } from 'react-icons/md';
+import {
+    MdBarChart,
+    MdPerson,
+    MdHome,
+    MdLock,
+    MdOutlineShoppingCart,
+    MdOutlinePets,
+    MdOutlineSlideshow,
+} from 'react-icons/md';
 
 // Admin Imports
 import MainDashboard from 'views/admin/default';
@@ -9,6 +17,7 @@ import NFTMarketplace from 'views/admin/marketplace';
 import Profile from 'views/admin/profile';
 import DataTables from 'views/admin/dataTables';
 import Animals from 'views/admin/animals';
+import Banners from 'views/admin/banners';
 
 // Auth Imports
 import SignInCentered from 'views/auth/signIn';
@@ -42,6 +51,13 @@ const routes = [
         icon: <Icon as={MdOutlinePets} width="20px" height="20px" color="inherit" />,
         path: '/animals',
         component: Animals,
+    },
+    {
+        name: 'Banners',
+        layout: '/admin',
+        icon: <Icon as={MdOutlineSlideshow} width="20px" height="20px" color="inherit" />,
+        path: '/banners',
+        component: Banners,
     },
     {
         name: 'Profile',

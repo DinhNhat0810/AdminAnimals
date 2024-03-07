@@ -2,46 +2,27 @@ import { validateSpecialCharactersRegex } from 'utils/constant';
 
 export const columns = [
     {
-        Header: 'check all',
-        key: 'checkbox',
-        type: 'checkbox',
+        Header: 'Title Vi',
+        key: 'titleVi',
+        type: 'string',
     },
     {
-        Header: 'Name Vi',
-        key: 'nameVi',
+        Header: 'Title En',
+        key: 'titleVi',
         type: 'string',
-        width: '200px',
     },
     {
-        Header: 'Name En',
-        key: 'nameEn',
+        Header: 'Description Vi',
+        key: 'descVi',
         type: 'string',
-        width: '200px',
     },
+
     {
-        Header: 'Type',
-        key: 'type',
+        Header: 'Description En',
+        key: 'descEn',
         type: 'string',
-        width: '150px',
     },
-    {
-        Header: 'Diet',
-        key: 'diet',
-        type: 'string',
-        width: '100px',
-    },
-    {
-        Header: 'Size',
-        key: 'size',
-        type: 'string',
-        width: '150px',
-    },
-    {
-        Header: 'Average Life span',
-        key: 'averageLifespan',
-        type: 'string',
-        width: '200px',
-    },
+
     {
         Header: 'Created date',
         key: 'createdAt',
@@ -61,8 +42,24 @@ export const columns = [
 
 export const addFields = [
     {
-        label: 'Name Vi',
-        key: 'nameVi',
+        label: 'Title Vi',
+        key: 'titleVi',
+        type: 'string',
+        required: true,
+        width: '50%',
+        rules: {
+            required: 'Please fill out this field',
+            minLength: { value: 2, message: 'Minimum length must be bigger than be 2.' },
+            maxLength: { value: 100, message: 'Maximum length must be less than 100.' },
+            pattern: {
+                value: validateSpecialCharactersRegex,
+                message: 'Name does not contain any special character.',
+            },
+        },
+    },
+    {
+        label: 'Title En',
+        key: 'titleEn',
         type: 'string',
         required: true,
         width: '50%',
@@ -77,70 +74,11 @@ export const addFields = [
             },
         },
     },
-    {
-        label: 'Name En',
-        key: 'nameEn',
-        type: 'string',
-        required: true,
-        width: '50%',
-        rules: {
-            required: 'Please fill out this field',
-            minLength: { value: 2, message: 'Minimum length must be bigger than be 2.' },
-            maxLength: { value: 100, message: 'Maximum length must be less than 100.' },
-            pattern: {
-                value: validateSpecialCharactersRegex,
 
-                message: 'Name does not contain any special character.',
-            },
-        },
-    },
-
-    {
-        label: 'Type',
-        key: 'type',
-        type: 'string',
-        required: false,
-        width: '50%',
-    },
-    {
-        label: 'Diet',
-        key: 'diet',
-        type: 'string',
-        required: false,
-        width: '50%',
-    },
-    {
-        label: 'Size',
-        key: 'size',
-        type: 'string',
-        required: false,
-        width: '50%',
-    },
-    {
-        label: 'Weight',
-        key: 'weight',
-        type: 'string',
-        required: false,
-        width: '50%',
-    },
-    {
-        label: 'Average Life span',
-        key: 'averageLifespan',
-        type: 'string',
-        required: false,
-        width: '50%',
-    },
-    {
-        label: 'Image',
-        key: 'img',
-        type: 'uploadImg',
-        required: false,
-        width: '50%',
-    },
     {
         label: 'Description Vi',
         key: 'descVi',
-        type: 'editor',
+        type: 'string',
         required: true,
         width: '100%',
         rules: {
@@ -151,12 +89,19 @@ export const addFields = [
     {
         label: 'Description En',
         key: 'descEn',
-        type: 'editor',
+        type: 'string',
         required: true,
         width: '100%',
         rules: {
             required: 'Please fill out this field',
             maxLength: { value: 9999, message: 'Maximum length must be less than 9999.' },
         },
+    },
+    {
+        label: 'Image',
+        key: 'imageUrl',
+        type: 'uploadImg',
+        required: true,
+        width: '100%',
     },
 ];

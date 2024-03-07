@@ -1,12 +1,13 @@
 // App.jsx / App.tsx
 
-import React, { useRef, useState } from 'react';
+import React, { memo, useRef, useState } from 'react';
 import { CKEditor } from '@ckeditor/ckeditor5-react';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import { Box, Input } from '@chakra-ui/react';
 
 const CheckEditor = (props) => {
     const { dataEditor = '', register, name, rules, setValue = () => {}, trigger = () => {}, ...rest } = props;
+    console.log('re-render');
 
     return (
         <Box>
@@ -36,4 +37,4 @@ const CheckEditor = (props) => {
     );
 };
 
-export default CheckEditor;
+export default memo(CheckEditor);
